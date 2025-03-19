@@ -101,7 +101,11 @@ yarn-error.log
 /coverage
 
 # Environment variables
-.env*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
 
 # IDE
@@ -113,3 +117,20 @@ yarn-error.log
 *.log
 *.orig
 .tmp/
+
+# Development rules and requirements
+cursorrules.md
+REQUIREMENTS.md
+
+# Build outputs
+dist/
+build/
+.expo/
+web-build/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
