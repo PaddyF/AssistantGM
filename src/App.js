@@ -1,11 +1,14 @@
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './navigation/AppNavigator';
+import WebErrorBoundary from './components/WebErrorBoundary';
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AppNavigator />
-    </SafeAreaProvider>
+    <WebErrorBoundary>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </WebErrorBoundary>
   );
 } 

@@ -4,10 +4,68 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const FANTRAX_API_BASE_URL = 'https://www.fantrax.com/fxpa/req';
 let authToken = null;
 
+// Cache configuration
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 const api = axios.create({
   baseURL: FANTRAX_API_BASE_URL,
   withCredentials: true // Important for maintaining session
 });
+
+const getCachedData = async (key) => {
+  try {
+    const cached = await AsyncStorage.getItem(key);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_EXPIRY) {
+        return data;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error reading from cache:', error);
+    return null;
+  }
+};
+
+const cacheData = async (key, data) => {
+  try {
+    const cacheItem = {
+      data,
+      timestamp: Date.now(),
+    };
+    await AsyncStorage.setItem(key, JSON.stringify(cacheItem));
+  } catch (error) {
+    console.error('Error writing to cache:', error);
+  }
+};
+
+// Helper function to handle API calls with caching
+const fetchWithCache = async (url, options = {}, useCache = true) => {
+  try {
+    // Check cache first if caching is enabled
+    if (useCache) {
+      const cachedData = await getCachedData(url);
+      if (cachedData) {
+        return cachedData;
+      }
+    }
+
+    // Make the API request
+    const response = await api.get(url, options);
+    const data = response.data;
+    
+    // Cache the response if caching is enabled
+    if (useCache) {
+      await cacheData(url, data);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fantrax API error:', error);
+    throw error;
+  }
+};
 
 // Set auth token after login
 export const setAuthToken = (token) => {
@@ -56,8 +114,11 @@ export const loginWithGoogle = async (idToken) => {
 // Get user's leagues
 export const getUserLeagues = async () => {
   try {
-    const response = await api.get('/getUserLeagues');
-    return response.data.leagues;
+    const data = await fetchWithCache('/getUserLeagues');
+    if (!data || !data.leagues) {
+      throw new Error('Failed to fetch user leagues');
+    }
+    return data.leagues;
   } catch (error) {
     console.error('Error fetching leagues:', error);
     throw error;
@@ -67,10 +128,13 @@ export const getUserLeagues = async () => {
 // Get league info
 export const getLeagueInfo = async (leagueId) => {
   try {
-    const response = await api.get('/getLeagueInfo', {
+    const data = await fetchWithCache('/getLeagueInfo', {
       params: { leagueId }
     });
-    return response.data;
+    if (!data) {
+      throw new Error('Failed to fetch league info');
+    }
+    return data;
   } catch (error) {
     console.error('Error fetching league info:', error);
     throw error;
@@ -80,10 +144,13 @@ export const getLeagueInfo = async (leagueId) => {
 // Get user's team in a league
 export const getTeamRoster = async (leagueId) => {
   try {
-    const response = await api.get('/getTeamRoster', {
+    const data = await fetchWithCache('/getTeamRoster', {
       params: { leagueId }
     });
-    return response.data.roster;
+    if (!data || !data.roster) {
+      throw new Error('Failed to fetch team roster');
+    }
+    return data.roster;
   } catch (error) {
     console.error('Error fetching team roster:', error);
     throw error;
@@ -93,10 +160,13 @@ export const getTeamRoster = async (leagueId) => {
 // Get league standings
 export const getLeagueStandings = async (leagueId) => {
   try {
-    const response = await api.get('/getLeagueStandings', {
+    const data = await fetchWithCache('/getLeagueStandings', {
       params: { leagueId }
     });
-    return response.data.standings;
+    if (!data || !data.standings) {
+      throw new Error('Failed to fetch league standings');
+    }
+    return data.standings;
   } catch (error) {
     console.error('Error fetching league standings:', error);
     throw error;
@@ -106,13 +176,16 @@ export const getLeagueStandings = async (leagueId) => {
 // Get matchup info
 export const getMatchupInfo = async (leagueId, scoringPeriodId) => {
   try {
-    const response = await api.get('/getMatchupInfo', {
+    const data = await fetchWithCache('/getMatchupInfo', {
       params: { 
         leagueId,
         scoringPeriodId 
       }
     });
-    return response.data.matchup;
+    if (!data || !data.matchup) {
+      throw new Error('Failed to fetch matchup info');
+    }
+    return data.matchup;
   } catch (error) {
     console.error('Error fetching matchup info:', error);
     throw error;
@@ -167,10 +240,13 @@ export const proposeTrade = async (leagueId, tradeData) => {
 // Get league messages/activity
 export const getLeagueActivity = async (leagueId) => {
   try {
-    const response = await api.get('/getLeagueActivity', {
+    const data = await fetchWithCache('/getLeagueActivity', {
       params: { leagueId }
     });
-    return response.data.activity;
+    if (!data || !data.activity) {
+      throw new Error('Failed to fetch league activity');
+    }
+    return data.activity;
   } catch (error) {
     console.error('Error fetching league activity:', error);
     throw error;

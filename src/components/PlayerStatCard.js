@@ -44,9 +44,9 @@ const PlayerStatCard = ({ player, onTimeRangeChange }) => {
     <View style={styles.card}>
       <View style={styles.header}>
         <Image 
-          source={{ uri: player.imageUrl }} 
+          source={{ uri: player.imageUrl || 'https://via.placeholder.com/150' }} 
           style={styles.playerImage}
-          defaultSource={require('../assets/player-placeholder.png')}
+          testID="player-image"
         />
         <View style={styles.playerInfo}>
           <Text style={styles.playerName}>{player.name}</Text>
@@ -131,10 +131,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   header: {

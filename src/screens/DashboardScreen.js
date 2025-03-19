@@ -8,7 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { auth } from '../firebase';
+import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
 import PlayerStatCard from '../components/PlayerStatCard';
 import GameCard from '../components/GameCard';
@@ -25,9 +25,32 @@ const DashboardScreen = () => {
   const [error, setError] = useState(null);
   const [playerTimeRanges, setPlayerTimeRanges] = useState({});
 
-  // Example player IDs - In a real app, these would come from user's team
-  const myTeamPlayerIds = [237, 115]; // LeBron James and Stephen Curry
-  const trendingPlayerIds = [3547396]; // Anthony Edwards
+  // TODO: REMOVE THIS SAMPLE TEAM CONFIGURATION
+  // This is a placeholder for testing the NBA API integration
+  // Replace with actual fantasy league team data when integration is complete
+  const myTeamPlayerIds = [
+    2544,  // LeBron James
+    201939, // Stephen Curry
+    203999, // Nikola Jokic
+    201142, // Kevin Durant
+    203507, // Giannis Antetokounmpo
+    201935, // James Harden
+    201566, // Damian Lillard
+    203999, // Nikola Jokic
+    201142, // Kevin Durant
+    203507  // Giannis Antetokounmpo
+  ];
+
+  // TODO: REMOVE THIS SAMPLE TRENDING PLAYERS
+  // This is a placeholder for testing trending players feature
+  // Replace with actual trending players data when integration is complete
+  const trendingPlayerIds = [
+    3547396, // Anthony Edwards
+    203999,  // Nikola Jokic
+    201142,  // Kevin Durant
+    203507,  // Giannis Antetokounmpo
+    201935   // James Harden
+  ];
 
   const fetchPlayerData = async (playerIds) => {
     try {
