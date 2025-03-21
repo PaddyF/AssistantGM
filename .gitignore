@@ -121,6 +121,7 @@ yarn-error.log
 # Development rules and requirements
 cursorrules.md
 REQUIREMENTS.md
+suggestions.md
 
 # Build outputs
 dist/
